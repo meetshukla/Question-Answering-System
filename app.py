@@ -20,16 +20,12 @@ models = {
 }
 tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
 
-# # Load the fine-tuned modeol
-# model = torch.load("finetunedmodelnewsqa",map_location=torch.device('cpu'))
-# model.eval()
 
 def predict(model,context,query):
-
   inputs = tokenizer.encode_plus(query, context, return_tensors='pt')
   outputs = model(**inputs)
-  answer_start = torch.argmax(outputs[0])  # get the most likely beginning of answer with the argmax of the score
-  answer_end = torch.argmax(outputs[1]) + 1 
+  answer_start = torch.argmax(outputs[0]) # get the most likely beginning of answer with the argmax of the score
+  answer_end = torch.argmax(outputs[1]) + 1
   answer = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs['input_ids'][0][answer_start:answer_end]))
 
   return answer
@@ -49,4 +45,4 @@ def answer():
     return jsonify({'answer': answer})
 
 if __name__ == '__main__':
-    app.run(port=5003)
+    app.run()
