@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Model Selector</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .container {
+        margin-top: 30px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px 0px #999;
+      }
+      #output {
+        margin-top: 20px;
+        background-color: #e9ecef;
+        padding: 20px;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mb-4">Model Selector</h1>
+      <div class="row">
+        <div class="col-sm-6">
+          <button id="modelA" class="btn btn-secondary btn-block mb-3">
+            NewsQA
+          </button>
+        </div>
+        <div class="col-sm-6">
+          <button id="modelB" class="btn btn-secondary btn-block mb-3">
+            Squad
+          </button>
+        </div>
+      </div>
+      <form id="form">
+        <div class="form-group">
+          <label for="model">Model</label>
+          <input
+            type="text"
+            id="model"
+            name="model"
+            class="form-control"
+            readonly
+          />
+        </div>
+        <div class="form-group">
+          <label for="context">Context</label>
+          <textarea
+            id="context"
+            name="context"
+            class="form-control"
+            rows="3"
+          ></textarea>
+        </div>
+        <div class="form-group">
+          <label for="question">Question</label>
+          <input
+            type="text"
+            id="question"
+            name="question"
+            class="form-control"
+          />
+        </div>
+        <button type="submit" id="submit" class="btn btn-primary">
+          Submit
+        </button>
+      </form>
+      <div id="output"></div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+      // Set model when button is clicked
+      document.getElementById("modelA").addEventListener("click", function () {
+        document.getElementById("model").value = "NewsQA";
+        document.getElementById("modelA").className =
+          "btn btn-primary btn-block mb-3";
+        document.getElementById("modelB").className =
+          "btn btn-secondary btn-block mb-3";
+      });
+
+      document.getElementById("modelB").addEventListener("click", function () {
+        document.getElementById("model").value = "Squad";
+        document.getElementById("modelB").className =
+          "btn btn-primary btn-block mb-3";
+        document.getElementById("modelA").className =
+          "btn btn-secondary btn-block mb-3";
+      });
+
+      // Submit form data to backend
+      document
+        .getElementById("form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          // Get form data
+          const formData = new FormData(event.target);
+          const data = {};
+          formData.forEach(function (value, key) {
+            data[key] = value;
+          });
+
+          // Send data to backend
+          fetch("/answer", {
+            method: "POST",
+            body: JSON.stringify({
+              model: data["model"],
+              context: data["context"],
+              question: data["question"],
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => response.json())
+            .then((result) => {
+              // Display result in output div
+              document.getElementById("output").innerHTML = result.answer;
+            })
+            .catch((error) => console.error(error));
+        });
+    </script>
+  </body>
+</html>
